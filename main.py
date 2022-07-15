@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
+from PIL import Image
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
@@ -53,8 +54,10 @@ class Analyze:
             # Save file
             sleep(10)
             driver.save_screenshot(f"{self.saved_path}/responsive.png")
-            image = driver.get_screenshot_as_base64()
-            print(image)
+
+            # Crop the image
+            image = Image.open(f"{self.saved_path}/responsive.png")
+            image.crop((170, 50, 1150, 700)).save(f"{self.saved_path}/responsive.png")
 
         elif "http" in self.main_url:
             # Get Responsive website URL
