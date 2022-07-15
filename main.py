@@ -53,8 +53,12 @@ class Analyze:
             # Save file
             sleep(10)
             driver.save_screenshot(f"{self.saved_path}/responsive.png")
-        else:
-            pass
+        elif "http" in self.main_url:
+            # Get Responsive website URL
+            driver.get("https://ui.dev/amiresponsive")
+
+            # Change window size for image size
+            driver.set_window_size(1300, 700)
         return print("Responsive Done!")
 
     def get_gtmetrix(self):
