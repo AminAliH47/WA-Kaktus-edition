@@ -22,6 +22,9 @@ class Analyze:
         self.saved_path = saved_path
         self.driver = webdriver.Chrome(self.webdriver_path, options=option)
 
+    def _create_directory(self):
+        pass
+
     def get_whois(self):
         pass
 
@@ -52,7 +55,7 @@ class Analyze:
             driver.execute_script("document.body.style.zoom='110%'")
 
             # Save file
-            sleep(11)
+            sleep(15)
             driver.save_screenshot(f"{self.saved_path}/responsive.png")
 
             # Crop and save the image
@@ -92,7 +95,34 @@ class Analyze:
         pass
 
     def get_backlinks(self):
-        pass
+        driver = self.driver
+
+        # Get Responsive website URL
+        driver.get("https://lxrmarketplace.com/seo-inbound-link-checker-tool.html")
+
+        # Change window size for image size
+        driver.set_window_size(1300, 700)
+
+        # Find searchbar in page
+        search_bar = self.driver.find_element(By.XPATH, '//input[@name="url"]')
+
+        # Pass Main URL to responsive website
+        search_bar.send_keys(self.main_url)
+        search_bar.send_keys(Keys.RETURN)
+
+        # Fixing image for good picture by changing style
+        sleep(1)
+        driver.execute_script('document.querySelector("#cookiePopup").remove()')
+        driver.execute_script('document.querySelector("#frm-wrap").remove()')
+
+        # Fixing image for good picture by changing style
+        driver.execute_script("window.scrollTo({top:30, left:0, behavior: 'smooth'})")
+
+        # Save file
+        sleep(10)
+        driver.save_screenshot(f"{self.saved_path}/backlinks.png")
+
+        return print("Backlinks Done!")
 
     def get_amp(self):
         pass
