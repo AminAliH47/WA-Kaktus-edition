@@ -38,9 +38,36 @@ class Analyze:
             # Find searchbar in page
             search_bar = self.driver.find_element(By.XPATH, '//*[@id="url"]')
 
+            # Pass Main URL to responsive website
+            search_bar.send_keys(self.main_url)
+            search_bar.send_keys(Keys.RETURN)
+
             # Turn background to Light
             dark_mode_btn = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/button')
             dark_mode_btn.click()
+
+            # Fixing image for good picture by changing style
+            sleep(1)
+            driver.execute_script("window.scrollTo({top:70, left:0, behavior: 'smooth'})")
+            driver.execute_script("document.body.style.zoom='110%'")
+
+            # Save file
+            sleep(11)
+            driver.save_screenshot(f"{self.saved_path}/responsive.png")
+            
+            # Crop and save the image
+            image = Image.open(f"{self.saved_path}/responsive.png")
+            image.crop((170, 30, 1230, 700)).save(f"{self.saved_path}/responsive.png")
+
+        elif "http" in self.main_url:
+            # Get Responsive website URL
+            driver.get("https://amiresponsive.co.uk/")
+
+            # Change window size for image size
+            driver.set_window_size(1300, 700)
+
+            # Find searchbar in page
+            search_bar = self.driver.find_element(By.XPATH, '//input[@name="site"]')
 
             # Pass Main URL to responsive website
             search_bar.send_keys(self.main_url)
@@ -48,23 +75,17 @@ class Analyze:
 
             # Fixing image for good picture by changing style
             sleep(1)
-            driver.execute_script("window.scrollTo({top:50, left:0, behavior: 'smooth'})")
-            driver.execute_script("document.body.style.zoom='105%'")
+            driver.execute_script('document.querySelector([role="main"]).style.background = "#fff"')
+            driver.execute_script('document.querySelector(".devices blockquote").remove()')
+
+            # Fixing image for good picture by changing style
+            driver.execute_script("window.scrollTo({top:70, left:0, behavior: 'smooth'})")
+            driver.execute_script("document.body.style.zoom='110%'")
 
             # Save file
             sleep(10)
             driver.save_screenshot(f"{self.saved_path}/responsive.png")
 
-            # Crop the image
-            image = Image.open(f"{self.saved_path}/responsive.png")
-            image.crop((170, 50, 1150, 700)).save(f"{self.saved_path}/responsive.png")
-
-        elif "http" in self.main_url:
-            # Get Responsive website URL
-            driver.get("https://ui.dev/amiresponsive")
-
-            # Change window size for image size
-            driver.set_window_size(1300, 700)
         return print("Responsive Done!")
 
     def get_gtmetrix(self):
