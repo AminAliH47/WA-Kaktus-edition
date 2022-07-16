@@ -6,7 +6,9 @@ from PIL import Image
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-option.add_argument('--headless')
+
+
+# option.add_argument('--headless')
 
 
 class Analyze:
@@ -57,7 +59,7 @@ class Analyze:
             # Save file
             sleep(15)
             driver.save_screenshot(f"{self.saved_path}/responsive.png")
-            
+
             # Crop and save the image
             image = Image.open(f"{self.saved_path}/responsive.png")
             image.crop((170, 30, 1230, 700)).save(f"{self.saved_path}/responsive.png")
@@ -92,7 +94,47 @@ class Analyze:
         return print("Responsive Done!")
 
     def get_gtmetrix(self):
-        pass
+        driver = self.driver
+
+        # Get Responsive website URL
+        driver.get("https://gtmetrix.com/")
+
+        # Change window size for image size
+        driver.set_window_size(1300, 700)
+
+        # === Login Section ===
+        sleep(2)
+        # Find login page button
+        login_btn = driver.find_element(By.XPATH, '//*[@id="user-nav-login"]/a')
+        login_btn.click()
+        # Find email and password field in page
+        email = self.driver.find_element(By.XPATH, '//input[@name="email"]')
+        password = self.driver.find_element(By.XPATH, '//input[@name="password"]')
+        submit_btn = self.driver.find_element(By.XPATH,
+                                              '//*[@id="menu-site-nav"]/div[2]/div[1]/form/div[4]/button'
+                                              )
+        # Pass Main URL to responsive website
+        email.send_keys("AminAlih47@gmail.com")
+        password.send_keys("$Kwt!G9GxvUaY%e")
+        submit_btn.click()
+
+        sleep(2)
+        # Find searchbar in page
+        search_bar = self.driver.find_element(By.XPATH, '//input[@name="url"]')
+
+        # Pass Main URL to responsive website
+        search_bar.send_keys(self.main_url)
+        search_bar.send_keys(Keys.RETURN)
+
+        # Fixing image for good picture by changing style
+        sleep(21)
+        driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'smooth'})")
+        driver.execute_script("document.body.style.zoom='90%'")
+
+        # Save file
+        driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
+
+        return print("GTMetrix Done!")
 
     def get_backlinks(self):
         driver = self.driver
