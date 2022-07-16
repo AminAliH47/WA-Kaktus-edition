@@ -57,17 +57,10 @@ class Analyze:
             # Save file
             sleep(15)
             driver.save_screenshot(f"{self.saved_path}/responsive.png")
-<<<<<< HEAD
-            image = Image.open(f"{self.saved_path}/responsive.png")
-            image.crop((170, 50, 1150, 700)).save(f"{self.saved_path}/responsive.png")
-
-            # print(image)
-=======
             
             # Crop and save the image
             image = Image.open(f"{self.saved_path}/responsive.png")
             image.crop((170, 30, 1230, 700)).save(f"{self.saved_path}/responsive.png")
->>>>>>> c7e84a7777855aa93366ee782cae56a0a1380ec5
 
         elif "http" in self.main_url:
             # Get Responsive website URL
@@ -83,7 +76,7 @@ class Analyze:
             search_bar.send_keys(self.main_url)
             search_bar.send_keys(Keys.RETURN)
 
-            # Fixing image for good picture by changing style
+            # make page for good picture by removing element
             sleep(1)
             driver.execute_script('document.querySelector([role="main"]).style.background = "#fff"')
             driver.execute_script('document.querySelector(".devices blockquote").remove()')
