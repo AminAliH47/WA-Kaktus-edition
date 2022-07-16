@@ -6,5 +6,6 @@ sadra_paths = ["F:\GitHub\Automation", "F:\GitHub\Automation\chromedriver.exe"] 
 
 anz = Analyze(url, "مشهد صنعت")
 
-anz.get_responsive()
+# anz.get_responsive()
 # anz.get_backlinks()
+anz.get_gtmetrix()
