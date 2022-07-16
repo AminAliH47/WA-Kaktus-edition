@@ -31,6 +31,7 @@ class Analyze:
 
     def get_responsive(self):
         driver = self.driver
+
         protocol = self.protocol  # protocol type
 
         # Hash map to hold reference data
