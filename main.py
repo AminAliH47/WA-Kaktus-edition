@@ -65,7 +65,7 @@ class Analyze:
             search_bar.send_keys(self.main_url)
             search_bar.send_keys(Keys.RETURN)
         except ElementNotInteractableException:
-            return print({'Error': 'Element not interactable! (Search Field)', 'Name': 'Responsive'})
+            return print({'Error': 'Element not intractable! (Search Field)', 'Name': 'Responsive'})
 
         if protocol == 'https':
             # Turn background to Light
@@ -162,6 +162,10 @@ class Analyze:
         # Save file
         driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
 
+        # Crop and save the image
+        image = Image.open(f"{self.saved_path}/gtmetrix.png")
+        image.crop((28, 15, 1080, 560)).save(f"{self.saved_path}/gtmetrix.png")
+
         return print("GTMetrix Done!")
 
     def get_backlinks(self):
@@ -187,7 +191,7 @@ class Analyze:
             search_bar.send_keys(self.main_url)
             search_bar.send_keys(Keys.RETURN)
         except ElementNotInteractableException:
-            return print({'Error!': 'Element not interactable!'})
+            return print({'Error!': 'Element not intractable!'})
 
         # Fixing image for good picture by changing style
         sleep(1)
