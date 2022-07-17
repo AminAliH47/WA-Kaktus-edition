@@ -8,9 +8,7 @@ from decouple import config
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-
-
-# option.add_argument('--headless')
+option.add_argument('--headless')
 
 
 class Analyze:
@@ -153,7 +151,7 @@ class Analyze:
         # if self._check_exists(By.XPATH, "/html/body/div[4]/div[1]"):
         #     return print("GTMetrix Login error!")
 
-        sleep(2)
+        sleep(4)
         # Find searchbar in page
         try:
             search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
@@ -177,7 +175,7 @@ class Analyze:
         submit_url_btn.click()
 
         # Fixing image for good picture by changing style
-        sleep(45)
+        sleep(59)
         driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'smooth'})")
         driver.execute_script("document.body.style.zoom='90%'")
 
