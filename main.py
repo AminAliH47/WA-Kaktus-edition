@@ -148,10 +148,11 @@ class Analyze:
         password.send_keys(config('PASSWORD'))
         submit_login_btn.click()
 
-        # if self._check_exists(By.XPATH, "/html/body/div[4]/div[1]"):
-        #     return print("GTMetrix Login error!")
+        sleep(3)
+        if self._check_exists(By.CLASS_NAME, "tooltip-error"):
+            return print("GTMetrix Login error!")
 
-        sleep(4)
+        sleep(3)
         # Find searchbar in page
         try:
             search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
