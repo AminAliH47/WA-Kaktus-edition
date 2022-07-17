@@ -113,7 +113,7 @@ class Analyze:
         sleep(2)
         # Find searchbar in page
         search_bar = driver.find_element(By.CLASS_NAME, 'js-analyze-form-url')
-
+        
         # Pass Main URL to responsive website
         search_bar.send_keys(self.main_url)
         search_bar.send_keys(Keys.RETURN)
@@ -158,6 +158,10 @@ class Analyze:
         # Save file
         sleep(3)
         driver.save_screenshot(f"{self.saved_path}/backlinks.png")
+
+        # Crop and save the image
+        image = Image.open(f"{self.saved_path}/backlinks.png")
+        image.crop((100, 150, 1250, 540)).save(f"{self.saved_path}/backlinks.png")
 
         return print("Backlinks Done!")
 
