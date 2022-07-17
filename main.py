@@ -40,8 +40,8 @@ class Analyze:
             'http_address': "https://amiresponsive.co.uk/",
             'https_search': '//*[@id="url"]',
             'http_search': '//input[@name="site"]',
-            'https_sleep': 15,
-            'http_sleep': 10,
+            'https_sleep': 22,
+            'http_sleep': 12,
             'https_size': (170, 30, 1230, 700),
             'http_size': (150, 150, 1150, 680),
         }
@@ -112,24 +112,14 @@ class Analyze:
 
         sleep(2)
         # Find searchbar in page
-
-        # search_bar = driver.find_element(By.XPATH,
-        #                                  '/html/body/div[1]/main/article/form/div[1]/div[1]/div/input'
-        #                                  )
-        # search_bar = driver.find_element(By.CLASS_NAME, 'js-analyze-form-url')
-
-        # search_bar = driver.find_element(By.XPATH,
-        #                                '/html/body/div[1]/main/article/form/div[1]/div[1]/div/input'
-        #                                )
-
-
+        search_bar = driver.find_element(By.CLASS_NAME, 'js-analyze-form-url')
+        
         # Pass Main URL to responsive website
         search_bar.send_keys(self.main_url)
         search_bar.send_keys(Keys.RETURN)
 
         # Fixing image for good picture by changing style
-
-        sleep(42)
+        sleep(45)
         driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'smooth'})")
         driver.execute_script("document.body.style.zoom='90%'")
 
