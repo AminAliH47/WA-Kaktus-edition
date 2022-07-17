@@ -3,7 +3,7 @@ from selenium.common import ElementNotInteractableException, NoSuchElementExcept
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 from decouple import config
 
 # Config Important Options for Webdriver
@@ -27,6 +27,15 @@ class Analyze:
 
     def _create_directory(self):
         pass
+
+    def _check_exists(self, by, el):
+        try:
+            self.driver.find_element(by, el)
+        except NoSuchElementException:
+            return False
+        except ElementNotInteractableException:
+            return print({'Error': "Element not interactable!", "name": "Checking exists method"})
+        return True
 
     def get_whois(self):
         pass
@@ -96,6 +105,9 @@ class Analyze:
     def get_gtmetrix(self):
         driver = self.driver
 
+        # Delete All Cookies
+        driver.delete_all_cookies()
+
         # Get Responsive website URL
         driver.get("https://gtmetrix.com/")
 
@@ -129,12 +141,17 @@ class Analyze:
         except NoSuchElementException:
             return print({'Error': 'No such element! (Submit Login Button)', 'Name': 'GTMetrix'})
 
+        # /html/body/div[1]/main/article/h1
+
         # Pass Main URL to responsive website
         email.send_keys(config('EMAIL'))
         password.send_keys(config('PASSWORD'))
         submit_login_btn.click()
 
-        sleep(2)
+        # if self._check_exists(By.XPATH, "/html/body/div[4]/div[1]"):
+        #     return print("GTMetrix Login error!")
+
+        sleep(4)
         # Find searchbar in page
         try:
             search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
@@ -142,7 +159,10 @@ class Analyze:
             return print({'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'})
 
         # Pass Main URL to GTMetrix website
-        search_bar.send_keys(self.main_url)
+        try:
+            search_bar.send_keys(self.main_url)
+        except ElementNotInteractableException:
+            return print({'Error': 'Element Not Interactable (Search URL Field)', 'Name': 'GTMetrix'})
 
         # Find and submit Main URL to GTMetrix website
         try:
@@ -155,7 +175,7 @@ class Analyze:
         submit_url_btn.click()
 
         # Fixing image for good picture by changing style
-        sleep(45)
+        sleep(59)
         driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'smooth'})")
         driver.execute_script("document.body.style.zoom='90%'")
 
@@ -212,7 +232,25 @@ class Analyze:
         return print("Backlinks Done!")
 
     def get_amp(self):
-        pass
+        # Get URL
+        url = self.main_url
+
+        # Load the raw image
+        raw_amp = Image.open('raw_images/AMP.jpg')
+
+        # Make image editable
+        image_editable = ImageDraw.Draw(raw_amp)
+
+        # Load the font
+        title_font = ImageFont.truetype('Fonts/Roboto-Medium.ttf', 21)
+
+        # Put the URL in image
+        image_editable.text((80, 28), url, (255, 255, 255), font=title_font)
+
+        # Save the image
+        raw_amp.save(f"{self.saved_path}/AMP.png")
+
+        return print("AMP Done!")
 
     def get_https(self):
         pass
