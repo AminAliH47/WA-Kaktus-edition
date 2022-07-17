@@ -1,8 +1,10 @@
 from selenium import webdriver
+from selenium.common import ElementNotInteractableException, NoSuchElementException
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
 from PIL import Image
+from decouple import config
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
@@ -53,11 +55,17 @@ class Analyze:
         driver.set_window_size(1300, 700)
 
         # Find searchbar in page
-        search_bar = driver.find_element(By.XPATH, hash_map[protocol + '_search'])
+        try:
+            search_bar = driver.find_element(By.XPATH, hash_map[protocol + '_search'])
+        except NoSuchElementException:
+            return print({'Error': 'No such element!', 'Name': 'Responsive'})
 
         # Pass Main URL to responsive website
-        search_bar.send_keys(self.main_url)
-        search_bar.send_keys(Keys.RETURN)
+        try:
+            search_bar.send_keys(self.main_url)
+            search_bar.send_keys(Keys.RETURN)
+        except ElementNotInteractableException:
+            return print({'Error': 'Element not interactable! (Search Field)', 'Name': 'Responsive'})
 
         if protocol == 'https':
             # Turn background to Light
@@ -97,26 +105,54 @@ class Analyze:
         # === Login Section ===
         sleep(2)
         # Find login page button
-        login_btn = driver.find_element(By.XPATH, '//*[@id="user-nav-login"]/a')
+        try:
+            login_btn = driver.find_element(By.XPATH, '//*[@id="user-nav-login"]/a')
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Login Button)', 'Name': 'GTMetrix'})
         login_btn.click()
+
         # Find email and password field in page
-        email = driver.find_element(By.XPATH, '//input[@name="email"]')
-        password = driver.find_element(By.XPATH, '//input[@name="password"]')
-        submit_login_btn = driver.find_element(By.XPATH,
-                                               '//*[@id="menu-site-nav"]/div[2]/div[1]/form/div[4]/button'
-                                               )
+        try:
+            email = driver.find_element(By.XPATH, '//input[@name="email"]')
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Email Input)', 'Name': 'GTMetrix'})
+
+        try:
+            password = driver.find_element(By.XPATH, '//input[@name="password"]')
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Password Input)', 'Name': 'GTMetrix'})
+
+        try:
+            submit_login_btn = driver.find_element(By.XPATH,
+                                                   '//*[@id="menu-site-nav"]/div[2]/div[1]/form/div[4]/button'
+                                                   )
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Submit Login Button)', 'Name': 'GTMetrix'})
+
         # Pass Main URL to responsive website
-        email.send_keys("AminAlih47@gmail.com")
-        password.send_keys("$Kwt!G9GxvUaY%e")
+        email.send_keys(config('EMAIL'))
+        password.send_keys(config('PASSWORD'))
         submit_login_btn.click()
 
         sleep(2)
         # Find searchbar in page
-        search_bar = driver.find_element(By.CLASS_NAME, 'js-analyze-form-url')
-        
-        # Pass Main URL to responsive website
+        try:
+            search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'})
+
+        # Pass Main URL to GTMetrix website
         search_bar.send_keys(self.main_url)
-        search_bar.send_keys(Keys.RETURN)
+
+        # Find and submit Main URL to GTMetrix website
+        try:
+            submit_url_btn = driver.find_element(By.XPATH,
+                                                 '/html/body/div[1]/main/article/form/div[1]/div[2]/button'
+                                                 )
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Submit URL Button)', 'Name': 'GTMetrix'})
+
+        submit_url_btn.click()
 
         # Fixing image for good picture by changing style
         sleep(45)
@@ -141,11 +177,17 @@ class Analyze:
         driver.set_window_size(1300, 700)
 
         # Find searchbar in page
-        search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
+        try:
+            search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
+        except NoSuchElementException:
+            return print({'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'})
 
-        # Pass Main URL to responsive website
-        search_bar.send_keys(self.main_url)
-        search_bar.send_keys(Keys.RETURN)
+        # Pass Main URL to backlinks website
+        try:
+            search_bar.send_keys(self.main_url)
+            search_bar.send_keys(Keys.RETURN)
+        except ElementNotInteractableException:
+            return print({'Error!': 'Element not interactable!'})
 
         # Fixing image for good picture by changing style
         sleep(1)
