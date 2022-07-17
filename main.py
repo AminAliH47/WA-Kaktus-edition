@@ -148,18 +148,20 @@ class Analyze:
         password.send_keys(config('PASSWORD'))
         submit_login_btn.click()
 
+        # Check Email and Password valid for login gtmetrix
         sleep(3)
         if self._check_exists(By.CLASS_NAME, "tooltip-error"):
             return print("GTMetrix Login error!")
 
-        sleep(3)
         # Find searchbar in page
+        sleep(1)
         try:
             search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
         except NoSuchElementException:
             return print({'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'})
 
         # Pass Main URL to GTMetrix website
+        sleep(2)
         try:
             search_bar.send_keys(self.main_url)
         except ElementNotInteractableException:
@@ -237,13 +239,13 @@ class Analyze:
         url = self.main_url
 
         # Load the raw image
-        raw_amp = Image.open('raw_images/AMP.jpg')
+        raw_amp = Image.open('assets/images/AMP.jpg')
 
         # Make image editable
         image_editable = ImageDraw.Draw(raw_amp)
 
         # Load the font
-        title_font = ImageFont.truetype('Fonts/Roboto-Medium.ttf', 21)
+        title_font = ImageFont.truetype('assets/fonts/Roboto-Medium.ttf', 21)
 
         # Put the URL in image
         image_editable.text((80, 28), url, (255, 255, 255), font=title_font)
