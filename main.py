@@ -239,7 +239,7 @@ class Analyze:
         url = self.main_url
 
         # Load the raw image
-        raw_amp = Image.open('assets/img/AMP.jpg')
+        raw_amp = Image.open('assets/images/AMP.jpg')
 
         # Make image editable
         image_editable = ImageDraw.Draw(raw_amp)
