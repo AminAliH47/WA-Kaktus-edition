@@ -8,7 +8,9 @@ from decouple import config
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-option.add_argument('--headless')
+
+
+# option.add_argument('--headless')
 
 
 class Analyze:
@@ -27,6 +29,15 @@ class Analyze:
 
     def _create_directory(self):
         pass
+
+    def _check_exists(self, by, el):
+        try:
+            self.driver.find_element(by, el)
+        except NoSuchElementException:
+            return False
+        except ElementNotInteractableException:
+            return print({'Error': "Element not interactable!", "name": "Checking exists method"})
+        return True
 
     def get_whois(self):
         pass
@@ -96,6 +107,9 @@ class Analyze:
     def get_gtmetrix(self):
         driver = self.driver
 
+        # Delete All Cookies
+        driver.delete_all_cookies()
+
         # Get Responsive website URL
         driver.get("https://gtmetrix.com/")
 
@@ -129,10 +143,15 @@ class Analyze:
         except NoSuchElementException:
             return print({'Error': 'No such element! (Submit Login Button)', 'Name': 'GTMetrix'})
 
+        # /html/body/div[1]/main/article/h1
+
         # Pass Main URL to responsive website
         email.send_keys(config('EMAIL'))
         password.send_keys(config('PASSWORD'))
         submit_login_btn.click()
+
+        # if self._check_exists(By.XPATH, "/html/body/div[4]/div[1]"):
+        #     return print("GTMetrix Login error!")
 
         sleep(2)
         # Find searchbar in page
@@ -142,7 +161,10 @@ class Analyze:
             return print({'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'})
 
         # Pass Main URL to GTMetrix website
-        search_bar.send_keys(self.main_url)
+        try:
+            search_bar.send_keys(self.main_url)
+        except ElementNotInteractableException:
+            return print({'Error': 'Element Not Interactable (Search URL Field)', 'Name': 'GTMetrix'})
 
         # Find and submit Main URL to GTMetrix website
         try:
