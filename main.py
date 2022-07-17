@@ -3,7 +3,7 @@ from selenium.common import ElementNotInteractableException, NoSuchElementExcept
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 from decouple import config
 
 # Config Important Options for Webdriver
@@ -232,7 +232,25 @@ class Analyze:
         return print("Backlinks Done!")
 
     def get_amp(self):
-        pass
+        # Get URL
+        url = self.main_url
+
+        # Load the raw image
+        raw_amp = Image.open('raw_images/AMP.jpg')
+
+        # Make image editable
+        image_editable = ImageDraw.Draw(raw_amp)
+
+        # Load the font
+        title_font = ImageFont.truetype('Fonts/Roboto-Medium.ttf', 21)
+
+        # Put the URL in image
+        image_editable.text((80, 28), url, (255, 255, 255), font=title_font)
+
+        # Save the image
+        raw_amp.save(f"{self.saved_path}/AMP.png")
+
+        return print("AMP Done!")
 
     def get_https(self):
         pass
