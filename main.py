@@ -8,7 +8,27 @@ from decouple import config
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-option.add_argument('--headless')
+
+
+# option.add_argument('--headless')
+
+
+class TextColors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+    def print_colored_text(self, color, text):
+        return print(f"{color}{text}")
+
+
+txtcolor = TextColors()
 
 
 class Analyze:
@@ -41,7 +61,8 @@ class Analyze:
         except NoSuchElementException:
             return False
         except ElementNotInteractableException:
-            return print({'Error': "Element not interactable!", "name": "Checking exists method"})
+            return txtcolor.print_colored_text(txtcolor.FAIL, {"Error": "Element not interactable!",
+                                                               "name": "Checking exists method"})
         return True
 
     def _wait_until(self, by: str, el: str):
@@ -65,6 +86,7 @@ class Analyze:
 
     def get_whois(self):
         pass
+        # return print("Whois Done!")
 
     def get_responsive(self):
         driver = self.driver
@@ -93,14 +115,14 @@ class Analyze:
         try:
             search_bar = driver.find_element(By.XPATH, hash_map[protocol + '_search'])
         except NoSuchElementException:
-            return print({'Error': 'No such element!', 'Name': 'Responsive'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element!', 'Name': 'Responsive'}")
 
         # Pass Main URL to responsive website
         try:
             search_bar.send_keys(self.main_url)
             search_bar.send_keys(Keys.RETURN)
         except ElementNotInteractableException:
-            return print({'Error': 'Element not intractable! (Search Field)', 'Name': 'Responsive'})
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (Search Field)', 'Name': 'Responsive'}")
 
         if protocol == 'https':
             # Turn background to Light
@@ -146,28 +168,26 @@ class Analyze:
         try:
             login_btn = driver.find_element(By.XPATH, '//*[@id="user-nav-login"]/a')
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Login Button)', 'Name': 'GTMetrix'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Login Button)', 'Name': 'GTMetrix'}")
         login_btn.click()
 
         # Find email and password field in page
         try:
             email = driver.find_element(By.XPATH, '//input[@name="email"]')
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Email Input)', 'Name': 'GTMetrix'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Email Input)', 'Name': 'GTMetrix'}")
 
         try:
             password = driver.find_element(By.XPATH, '//input[@name="password"]')
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Password Input)', 'Name': 'GTMetrix'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Password Input)', 'Name': 'GTMetrix'}")
 
         try:
             submit_login_btn = driver.find_element(By.XPATH,
                                                    '//*[@id="menu-site-nav"]/div[2]/div[1]/form/div[4]/button'
                                                    )
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Submit Login Button)', 'Name': 'GTMetrix'})
-
-        # /html/body/div[1]/main/article/h1
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Submit Login Button)', 'Name': 'GTMetrix'}")
 
         # Pass Main URL to responsive website
         email.send_keys(config('EMAIL'))
@@ -184,14 +204,14 @@ class Analyze:
         try:
             search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'}")
 
         # Pass Main URL to GTMetrix website
         sleep(2)
         try:
             search_bar.send_keys(self.main_url)
         except ElementNotInteractableException:
-            return print({'Error': 'Element Not Interactable (Search URL Field)', 'Name': 'GTMetrix'})
+            return print(txtcolor.FAIL + "{'Error': 'Element Not Interactable (Search URL Field)', 'Name': 'GTMetrix'}")
 
         # Find and submit Main URL to GTMetrix website
         try:
@@ -199,7 +219,7 @@ class Analyze:
                                                  '/html/body/div[1]/main/article/form/div[1]/div[2]/button'
                                                  )
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Submit URL Button)', 'Name': 'GTMetrix'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Submit URL Button)', 'Name': 'GTMetrix'}")
 
         submit_url_btn.click()
 
@@ -234,16 +254,16 @@ class Analyze:
 
         # Find searchbar in page
         try:
-            search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
+            search_bar = driver.find_element(By.XPATH, '//input[@name="urls"]')
         except NoSuchElementException:
-            return print({'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'})
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'}")
 
         # Pass Main URL to backlinks website
         try:
             search_bar.send_keys(self.main_url)
             search_bar.send_keys(Keys.RETURN)
         except ElementNotInteractableException:
-            return print({'Error!': 'Element not intractable!'})
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
 
         # Fixing image for good picture by changing style
         sleep(1)
