@@ -29,6 +29,13 @@ class Analyze:
         pass
 
     def _check_exists(self, by, el):
+        """
+        Check element exists in page or not.
+
+        :param by: By what basis to find the element?
+        :param el: The element you want to find on the page
+        :return: If Element exists in page return True, else return False
+        """
         try:
             self.driver.find_element(by, el)
         except NoSuchElementException:
@@ -36,6 +43,25 @@ class Analyze:
         except ElementNotInteractableException:
             return print({'Error': "Element not interactable!", "name": "Checking exists method"})
         return True
+
+    def _wait_until(self, by: str, el: str):
+        """
+        It checks every five seconds Element Exists in page or not
+        If Element Exists in page, It check again else break loop.
+
+        (It's good for when you want check is page reloaded or not)
+
+        :param by: By what basis to find the element?
+        :param el: The element you want to find on the page
+        """
+        driver = self.driver
+
+        while True:
+            sleep(5)
+            try:
+                driver.find_element(by, el)
+            except NoSuchElementException:
+                break
 
     def get_whois(self):
         pass
@@ -177,8 +203,11 @@ class Analyze:
 
         submit_url_btn.click()
 
+        # Wait for analyzing complete
+        self._wait_until(By.XPATH, "/html/body/div[1]/main/article/h1")
+
         # Fixing image for good picture by changing style
-        sleep(59)
+        sleep(5)
         driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'smooth'})")
         driver.execute_script("document.body.style.zoom='90%'")
 
@@ -239,6 +268,7 @@ class Analyze:
         url = self.main_url
 
         # Load the raw image
+        sleep(2)
         raw_amp = Image.open('assets/images/AMP.jpg')
 
         # Make image editable
