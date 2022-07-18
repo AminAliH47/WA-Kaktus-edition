@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from time import sleep
 from PIL import Image, ImageFont, ImageDraw
 from decouple import config
+import requests
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
@@ -58,8 +59,7 @@ class Analyze:
         except NoSuchElementException:
             return False
         except ElementNotInteractableException:
-            return txtcolor.print_colored_text(txtcolor.FAIL, {"Error": "Element not interactable!",
-                                                               "name": "Checking exists method"})
+            return print(txtcolor.FAIL + '{"Error": "Element not interactable!", "name": "Checking exists method"}')
         return True
 
     def _wait_until(self, by: str, el: str):
@@ -82,7 +82,18 @@ class Analyze:
                 break
 
     def get_whois(self):
-        pass
+
+        api_url = "https://www.whoisxmlapi.com/whoisserver/WhoisService"
+
+        params = {
+            "domainName": self.main_url,
+            "apiKey": config("WHOIS_API"),
+            "outputFormat": "JSON"
+        }
+
+        response = requests.request("GET", api_url, params=params).json()
+
+        sleep(5)
         # return print("Whois Done!")
 
     def get_responsive(self):
