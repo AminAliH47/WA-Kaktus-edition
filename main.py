@@ -24,9 +24,6 @@ class TextColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-    def print_colored_text(self, color, text):
-        return print(f"{color}{text}")
-
 
 txtcolor = TextColors()
 
