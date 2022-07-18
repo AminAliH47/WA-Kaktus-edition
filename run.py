@@ -7,6 +7,7 @@ SADRA_PATH = ["F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe"]  
 
 anz = Analyze(url, name)
 
+anz.get_whois()
 anz.get_responsive()
 anz.get_backlinks()
 anz.get_gtmetrix()
