@@ -9,9 +9,7 @@ import requests
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-
-
-# option.add_argument('--headless')
+option.add_argument('--headless')
 
 
 class TextColors:
@@ -82,16 +80,47 @@ class Analyze:
                 break
 
     def get_whois(self):
+        import re
 
+        # Our whois API
         api_url = "https://www.whoisxmlapi.com/whoisserver/WhoisService"
 
+        # Parameters to send with request
         params = {
             "domainName": self.main_url,
             "apiKey": config("WHOIS_API"),
             "outputFormat": "JSON"
         }
 
+        # Get Response for our website from whois API
         response = requests.request("GET", api_url, params=params).json()
+        response = response['WhoisRecord']
+
+        # Archive Required data for whois image
+        domain_name = response['domainName']
+        registrant_country = response['registrant']['countryCode']
+        register_status = response['registryData']['status']
+
+        # Get Registrar data from raw text
+        registrar_txt = response['strippedText']
+        s = re.compile(r"Registrar: (.*)\n")
+        registrar_ex = f'{s.search(registrar_txt).group()}\n'
+
+        s = re.compile(r"Registrar IANA ID: (.*)\n")
+        registrar_iana = f'IANA ID: {s.search(registrar_txt).group()}\n'
+
+        s = re.compile(r"Registrar URL: (.*)\n")
+        registrar_url = f'URL: {s.search(registrar_txt).group()}\n'
+
+        s = re.compile(r"Registrar Abuse Contact Email: (.*)\n")
+        registrar_email = f'{s.search(registrar_txt).group()}\n'
+
+        s = re.compile(r"Registrar Abuse Contact Phone: (.*)\n")
+        registrar_phone = f'(p) {s.search(registrar_txt).group()}\n'
+
+        registrar = registrar_ex + registrar_iana + registrar_url + registrar_email + registrar_phone
+
+        print(registrar)
 
         sleep(5)
         # return print("Whois Done!")
@@ -208,9 +237,9 @@ class Analyze:
             return print("GTMetrix Login error!")
 
         # Find searchbar in page
-        sleep(1)
+        sleep(5)
         try:
-            search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
+            search_bar = driver.find_element(By.XPATH, '/html/body/div[1]/main/article/form/div[1]/div[1]/div/input')
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'}")
 
@@ -262,7 +291,7 @@ class Analyze:
 
         # Find searchbar in page
         try:
-            search_bar = driver.find_element(By.XPATH, '//input[@name="urls"]')
+            search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'}")
 
