@@ -342,5 +342,26 @@ class Analyze:
 
         return print("AMP Done!")
 
-    def get_https(self):
-        pass
+    def get_ssl(self):
+        # Get URL and SSL
+        url = self.main_url
+        ssl = self.protocol
+
+        # Set coordination
+        coordination = (172, 43) if ssl == 'https' else (260, 43)
+
+        # Load the raw image
+        sleep(2)
+        raw_https = Image.open(f'assets/images/{ssl}.jpg')
+
+        # Make image editable
+        editable = ImageDraw.Draw(raw_https)
+
+        # Draw text in the raw image
+        font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 14)
+        editable.text(coordination, url, (255, 255, 255), font=font)
+
+        # Save the image
+        raw_https.save(f"{self.saved_path}/ssl.png")
+
+        return print("SSL Done!")
