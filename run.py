@@ -1,12 +1,12 @@
 from main import Analyze
 
-# url = input("Please Enter Company URL: \n")
-url = 'http://zarazma.com/'
+url = input("Please Enter Company URL: \n")
+# url = 'http://zarazma.com/'
 name = "مشهد صنعت"
 
 SADRA_PATH = ["F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe"]  # Don't touch this line. (NEVER)
 
-anz = Analyze(url, name, "F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe")
+anz = Analyze(url, name)
 
 # anz.get_whois()
 # anz.get_responsive()
@@ -14,5 +14,6 @@ anz = Analyze(url, name, "F:/GitHub/Automation", "F:/GitHub/Automation/chromedri
 # anz.get_gtmetrix()
 # anz.get_amp()
 anz.get_ssl()
+
 # Close Driver After Analyze
 anz.driver.close()
