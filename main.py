@@ -43,7 +43,7 @@ class Analyze:
         self.saved_path = saved_path
         self.driver = webdriver.Chrome(self.webdriver_path, options=option)
 
-    def _create_directory(self):
+    def create_directory(self):
         pass
 
     def _check_exists(self, by, el):
@@ -113,14 +113,31 @@ class Analyze:
         # Archive Required data for whois image
         domain_name = response['domainName']
 
-        country_code = response['registrant']['countryCode']
-        register_status = response['status']
-        name_servers = "\n".join(response['nameServers']['hostNames'])
+        # Get register status
+        try:
+            register_status = response['status']
+        except KeyError:
+            register_status = "—"
+
+        # Get Nameservers
+        try:
+            name_servers = "\n".join(response['nameServers']['hostNames'])
+        except KeyError:
+            name_servers = "—"
 
         # Dates
-        created_date = response['createdDateNormalized']
-        updated_date = response['updatedDateNormalized']
-        expires_date = response['expiresDateNormalized']
+        try:
+            created_date = f"Created on {response['createdDateNormalized']}"
+        except KeyError:
+            created_date = "Created on —"
+        try:
+            updated_date = f"Updated on {response['updatedDateNormalized']}"
+        except KeyError:
+            updated_date = "Updated on —"
+        try:
+            expires_date = f"Expires on {response['expiresDateNormalized']}"
+        except KeyError:
+            expires_date = "Expires on —"
 
         # Pass Main URL to whois website
         sleep(4)
@@ -139,8 +156,13 @@ class Analyze:
         pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
         ip_address = pattern.search(raw_dns_text).group()
 
+        ip_info = requests.get(f"http://ip-api.com/json/{ip_address}").json()
+
         # Get IP Location
-        ip_location = response['registrant']['country']
+        ip_location = ip_info['country']
+
+        # Get country code
+        country_code = ip_info['countryCode']
 
         # Get Hosted website on server
         try:
@@ -152,6 +174,7 @@ class Analyze:
         flag_url = f'https://countryflagsapi.com/png/{country_code}'
         flag = Image.open(requests.get(flag_url, stream=True).raw)
         flag = flag.convert("RGBA")
+        flag.save("flag.png")
 
     def get_responsive(self):
         driver = self.driver
@@ -400,7 +423,7 @@ class Analyze:
 
         # Set coordination for URL
         url_coordination = (172, 42) if protocol == 'https' else (260, 42)
-  
+
         # Draw URL text in the raw image
         editable.text(url_coordination, url, (255, 255, 255), font=font)
 
