@@ -177,6 +177,11 @@ class Analyze:
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
 
+        hosted_website = '  -  ' + hosted_website
+
+        # Get Website title
+        title = driver.title
+
         # Get country flag
         flag_url = f'https://countryflagsapi.com/png/{country_code}'
         flag = Image.open(requests.get(flag_url, stream=True).raw)
