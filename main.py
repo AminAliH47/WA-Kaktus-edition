@@ -34,7 +34,7 @@ class Analyze:
     saved_path = "C:/Users/amina/OneDrive/Documents/Kaktus"
 
     def __init__(self, main_url,
-                 name, saved_path=saved_path,
+                 name="Analyze", saved_path=saved_path,
                  webdriver_path=webdriver_path):
         self.main_url = main_url
         self.name = name
@@ -44,7 +44,21 @@ class Analyze:
         self.driver = webdriver.Chrome(self.webdriver_path, options=option)
 
     def create_directory(self):
-        pass
+        import os
+
+        # Make Path
+        path = os.path.join(self.saved_path, self.name)
+
+        # Create Directory
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            return print("Directory already exists!")
+
+        self.saved_path = path
+
+        print("Directory Created!")
+        return self.saved_path
 
     def _check_exists(self, by, el):
         """
@@ -169,6 +183,8 @@ class Analyze:
             hosted_website = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]/b').text
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
+
+        print(hosted_website)
 
         # Get country flag
         flag_url = f'https://countryflagsapi.com/png/{country_code}'
