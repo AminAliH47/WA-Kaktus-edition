@@ -9,7 +9,9 @@ import requests
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-option.add_argument('--headless')
+
+
+# option.add_argument('--headless')
 
 
 class TextColors:
@@ -80,6 +82,18 @@ class Analyze:
                 break
 
     def get_whois(self):
+        driver = self.driver
+
+        # Get URL from view dns website
+        driver.get("https://dnslytics.com/reverse-ip")
+
+        # Find searchbar in page
+        try:
+            search_bar = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[3]/form/input[1]')
+        except NoSuchElementException:
+            return print(txtcolor.FAIL + "{'Error': 'No such element!', 'Name': 'Whois'}")
+
+        # Import regex
         import re
 
         # Our whois API
@@ -98,32 +112,46 @@ class Analyze:
 
         # Archive Required data for whois image
         domain_name = response['domainName']
-        registrant_country = response['registrant']['countryCode']
-        register_status = response['registryData']['status']
 
-        # Get Registrar data from raw text
-        registrar_txt = response['strippedText']
-        s = re.compile(r"Registrar: (.*)\n")
-        registrar_ex = f'{s.search(registrar_txt).group()}\n'
+        country_code = response['registrant']['countryCode']
+        register_status = response['status']
+        name_servers = "\n".join(response['nameServers']['hostNames'])
 
-        s = re.compile(r"Registrar IANA ID: (.*)\n")
-        registrar_iana = f'IANA ID: {s.search(registrar_txt).group()}\n'
+        # Dates
+        created_date = response['createdDateNormalized']
+        updated_date = response['updatedDateNormalized']
+        expires_date = response['expiresDateNormalized']
 
-        s = re.compile(r"Registrar URL: (.*)\n")
-        registrar_url = f'URL: {s.search(registrar_txt).group()}\n'
+        # Pass Main URL to whois website
+        sleep(4)
+        try:
+            search_bar.send_keys(domain_name)
+            search_bar.send_keys(Keys.RETURN)
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (Search Field)', 'Name': 'Whois'}")
 
-        s = re.compile(r"Registrar Abuse Contact Email: (.*)\n")
-        registrar_email = f'{s.search(registrar_txt).group()}\n'
+        # Get IP Address
+        sleep(4)
+        try:
+            raw_dns_text = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]').text
+        except NoSuchElementException:
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Raw DNS text)', 'Name': 'Whois'}")
+        pattern = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+        ip_address = pattern.search(raw_dns_text).group()
 
-        s = re.compile(r"Registrar Abuse Contact Phone: (.*)\n")
-        registrar_phone = f'(p) {s.search(registrar_txt).group()}\n'
+        # Get IP Location
+        ip_location = response['registrant']['country']
 
-        registrar = registrar_ex + registrar_iana + registrar_url + registrar_email + registrar_phone
+        # Get Hosted website on server
+        try:
+            hosted_website = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]/b').text
+        except NoSuchElementException:
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
 
-        print(registrar)
-
-        sleep(5)
-        # return print("Whois Done!")
+        # Get country flag
+        flag_url = f'https://countryflagsapi.com/png/{country_code}'
+        flag = Image.open(requests.get(flag_url, stream=True).raw)
+        flag = flag.convert("RGBA")
 
     def get_responsive(self):
         driver = self.driver
