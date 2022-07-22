@@ -139,6 +139,8 @@ class Analyze:
         except KeyError:
             expires_date = "Expires on —"
 
+        dates = f'{created_date}\n{expires_date}\n{updated_date}'
+
         # Pass Main URL to whois website
         sleep(4)
         try:
@@ -170,11 +172,49 @@ class Analyze:
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
 
+        hosted_website = '  -  ' + hosted_website
+
+        # Get Website title
+        title = driver.title
+
         # Get country flag
         flag_url = f'https://countryflagsapi.com/png/{country_code}'
         flag = Image.open(requests.get(flag_url, stream=True).raw)
         flag = flag.convert("RGBA")
-        flag.save("flag.png")
+
+        # Resize flag
+        (width, height) = (flag.width // 20, flag.height // 20)
+        flag = flag.resize((width, height))
+
+        # Load raw whois image
+        whois_image = Image.open('assets/images/whois.jpg')
+
+        # Make image editable
+        editable = ImageDraw.Draw(whois_image)
+
+        # Load fonts
+        font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 10)
+        domain_font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 20)
+
+        # Set colors
+        color = (90, 90, 90)
+        domain_color = (70, 70, 70)
+
+        # Add text to raw image
+        editable.text((165, 0), domain_name, domain_color, font=domain_font)  # Domain name
+        editable.text((120, 65), register_status, color, font=font)  # Registrar status
+        editable.text((120, 90), name_servers, color, font=font)  # Name servers
+        editable.text((120, 159), dates, color, font=font)  # Dates
+        editable.text((120, 250), ip_address, color, font=font)  # IP address
+        editable.text((195, 250), hosted_website, color, font=font)  # Hosted websites
+        editable.text((140, 273), ip_location, color, font=font)  # IP location
+        editable.text((120, 330), title, color, font=font)  # Website title
+
+        # Add flag to raw image
+        whois_image.paste(flag, (120, 275), flag)
+
+        # Save whois image
+        whois_image.save(f"{self.saved_path}/whois.png")
 
     def get_responsive(self):
         driver = self.driver
