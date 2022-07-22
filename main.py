@@ -9,9 +9,7 @@ import requests
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-
-
-# option.add_argument('--headless')
+option.add_argument('--headless')
 
 
 class TextColors:
@@ -83,6 +81,12 @@ class Analyze:
 
     def get_whois(self):
         driver = self.driver
+        website_driver = self.driver
+
+        website_driver.get(self.main_url)
+
+        # Get Website title
+        title = website_driver.title
 
         # Get URL from view dns website
         driver.get("https://dnslytics.com/reverse-ip")
@@ -169,6 +173,7 @@ class Analyze:
         # Get Hosted website on server
         try:
             hosted_website = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]/b').text
+            hosted_website = f"  -  {hosted_website} other sites hosted on this server"
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
 
@@ -195,6 +200,7 @@ class Analyze:
         # Load fonts
         font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 10)
         domain_font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 20)
+        title_font = ImageFont.truetype('assets/fonts/Vazirmatn-Regular.ttf', 10)
 
         # Set colors
         color = (90, 90, 90)
@@ -208,13 +214,15 @@ class Analyze:
         editable.text((120, 250), ip_address, color, font=font)  # IP address
         editable.text((195, 250), hosted_website, color, font=font)  # Hosted websites
         editable.text((140, 273), ip_location, color, font=font)  # IP location
-        editable.text((120, 330), title, color, font=font)  # Website title
+        editable.text((120, 330), title, color, font=title_font)  # Website title
 
         # Add flag to raw image
         whois_image.paste(flag, (120, 275), flag)
 
         # Save whois image
         whois_image.save(f"{self.saved_path}/whois.png")
+
+        return print("Whois Done!")
 
     def get_responsive(self):
         driver = self.driver

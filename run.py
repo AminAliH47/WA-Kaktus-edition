@@ -4,8 +4,12 @@ url = input("Please Enter Company URL: \n")
 name = "مشهد صنعت"
 
 SADRA_PATH = ["F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe"]  # Don't touch this line. (NEVER)
+AMIN_PATH = ["C:/Users/amina/OneDrive/Documents/Kaktus", "C:/Users/amina/Downloads/chromedriver.exe"]
 
 anz = Analyze(url, name, SADRA_PATH[0], SADRA_PATH[1])
+
+# Create directory
+anz.create_directory()
 
 anz.get_whois()
 # anz.get_responsive()
