@@ -400,7 +400,7 @@ class Analyze:
 
         # Set coordination for URL
         url_coordination = (172, 42) if protocol == 'https' else (260, 42)
-
+  
         # Draw URL text in the raw image
         editable.text(url_coordination, url, (255, 255, 255), font=font)
 
