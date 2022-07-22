@@ -9,9 +9,7 @@ import requests
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
-
-
-# option.add_argument('--headless')
+option.add_argument('--headless')
 
 
 class TextColors:
@@ -34,7 +32,7 @@ class Analyze:
     saved_path = "C:/Users/amina/OneDrive/Documents/Kaktus"
 
     def __init__(self, main_url,
-                 name="Analyze", saved_path=saved_path,
+                 name, saved_path=saved_path,
                  webdriver_path=webdriver_path):
         self.main_url = main_url
         self.name = name
@@ -44,21 +42,7 @@ class Analyze:
         self.driver = webdriver.Chrome(self.webdriver_path, options=option)
 
     def create_directory(self):
-        import os
-
-        # Make Path
-        path = os.path.join(self.saved_path, self.name)
-
-        # Create Directory
-        try:
-            os.mkdir(path)
-        except FileExistsError:
-            return print("Directory already exists!")
-
-        self.saved_path = path
-
-        print("Directory Created!")
-        return self.saved_path
+        pass
 
     def _check_exists(self, by, el):
         """
@@ -97,6 +81,12 @@ class Analyze:
 
     def get_whois(self):
         driver = self.driver
+        website_driver = self.driver
+
+        website_driver.get(self.main_url)
+
+        # Get Website title
+        title = website_driver.title
 
         # Get URL from view dns website
         driver.get("https://dnslytics.com/reverse-ip")
@@ -153,6 +143,8 @@ class Analyze:
         except KeyError:
             expires_date = "Expires on —"
 
+        dates = f'{created_date}\n{expires_date}\n{updated_date}'
+
         # Pass Main URL to whois website
         sleep(4)
         try:
@@ -181,16 +173,51 @@ class Analyze:
         # Get Hosted website on server
         try:
             hosted_website = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]/b').text
+            hosted_website = f"  -  {hosted_website} other sites hosted on this server"
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
-
-        print(hosted_website)
 
         # Get country flag
         flag_url = f'https://countryflagsapi.com/png/{country_code}'
         flag = Image.open(requests.get(flag_url, stream=True).raw)
         flag = flag.convert("RGBA")
-        flag.save("flag.png")
+
+        # Resize flag
+        (width, height) = (flag.width // 20, flag.height // 20)
+        flag = flag.resize((width, height))
+
+        # Load raw whois image
+        whois_image = Image.open('assets/images/whois.jpg')
+
+        # Make image editable
+        editable = ImageDraw.Draw(whois_image)
+
+        # Load fonts
+        font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 10)
+        domain_font = ImageFont.truetype('assets/fonts/Lato-Regular.ttf', 20)
+        title_font = ImageFont.truetype('assets/fonts/Vazirmatn-Regular.ttf', 10)
+
+        # Set colors
+        color = (90, 90, 90)
+        domain_color = (70, 70, 70)
+
+        # Add text to raw image
+        editable.text((165, 0), domain_name, domain_color, font=domain_font)  # Domain name
+        editable.text((120, 65), register_status, color, font=font)  # Registrar status
+        editable.text((120, 90), name_servers, color, font=font)  # Name servers
+        editable.text((120, 159), dates, color, font=font)  # Dates
+        editable.text((120, 250), ip_address, color, font=font)  # IP address
+        editable.text((195, 250), hosted_website, color, font=font)  # Hosted websites
+        editable.text((140, 273), ip_location, color, font=font)  # IP location
+        editable.text((120, 330), title, color, font=title_font)  # Website title
+
+        # Add flag to raw image
+        whois_image.paste(flag, (120, 275), flag)
+
+        # Save whois image
+        whois_image.save(f"{self.saved_path}/whois.png")
+
+        return print("Whois Done!")
 
     def get_responsive(self):
         driver = self.driver
