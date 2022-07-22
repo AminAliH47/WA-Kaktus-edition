@@ -343,40 +343,48 @@ class Analyze:
         return print("AMP Done!")
 
     def get_ssl(self):
+        driver = self.driver
+        protocol = self.protocol
+
         # Get URL and SSL
         url = self.main_url
-
-        driver = self.driver
 
         # Get website URL
         driver.get(url)
 
-        ssl = self.protocol
-
         # Load the raw image
-        sleep(2)
-        raw_https = Image.open(f'assets/images/{ssl}.jpg')
+        raw_https = Image.open(f'assets/images/{protocol}.jpg')
+        raw_https = raw_https.convert("RGBA")
 
-        # Make image editable
+        # Get Favicon
+        favicon_url = f'http://www.google.com/s2/favicons?domain={url}'
+        favicon = Image.open(requests.get(favicon_url, stream=True).raw)
+        favicon = favicon.convert("RGBA")
+
+        # Paste favicon on https raw image
+        raw_https.paste(favicon, (17, 8), favicon)
+
+        # Make https raw image editable
         editable = ImageDraw.Draw(raw_https)
 
         # Add Font to our text
         font = ImageFont.truetype('assets/fonts/Vazirmatn-Regular.ttf', 14)
 
         # Set coordination for URL
-        url_coordination = (172, 42) if ssl == 'https' else (260, 42)
+        url_coordination = (172, 42) if protocol == 'https' else (260, 42)
+  
         # Draw URL text in the raw image
         editable.text(url_coordination, url, (255, 255, 255), font=font)
 
         # Get Title from website
-        title = driver.find_element(By.TAG_NAME, "title").get_attribute("innerText")
+        title = driver.title
+        title = (title[:20] + '...') if len(title) > 20 else title
         # Set coordination for Page Title
-        print(title[0].isalpha())
-        title_coordination = (41, 7) if title[0].isalpha() else (145, -10)
+        title_coordination = (41, 7)
         # Draw Title text in the raw image
         editable.text(title_coordination, title, (255, 255, 255), font=font, direction="ltr")
 
         # Save the image
-        raw_https.save(f"{self.saved_path}/ssl.png")
+        raw_https.save(f"{self.saved_path}/ssl.png", format='png')
 
         return print("SSL Done!")
