@@ -315,7 +315,7 @@ class Analyze:
         driver.set_window_size(1280, 1024)
 
         # === Login Section ===
-        sleep(2)
+        sleep(3)
         # Find login page button
         try:
             login_btn = driver.find_element(By.XPATH, '//*[@id="user-nav-login"]/a')
@@ -342,9 +342,13 @@ class Analyze:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Submit Login Button)', 'Name': 'GTMetrix'}")
 
         # Pass Main URL to responsive website
-        email.send_keys(config('EMAIL'))
-        password.send_keys(config('PASSWORD'))
-        submit_login_btn.click()
+        sleep(3)
+        try:
+            email.send_keys(config('EMAIL'))
+            password.send_keys(config('PASSWORD'))
+            submit_login_btn.click()
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element Not Interactable (Email Field)', 'Name': 'GTMetrix'}")
 
         # Check Email and Password valid for login gtmetrix
         sleep(3)
