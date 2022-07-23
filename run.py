@@ -6,7 +6,7 @@ name = "شهدین ۲"
 SADRA_PATH = ["F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe"]  # Don't touch this line. (NEVER)
 AMIN_PATH = ["C:/Users/amina/OneDrive/Documents/Kaktus", "C:/Users/amina/Downloads/chromedriver.exe"]
 
-anz = Analyze(url, name, SADRA_PATH[0], SADRA_PATH[1])
+anz = Analyze(url, name)
 
 # Create directory
 anz.create_directory()
