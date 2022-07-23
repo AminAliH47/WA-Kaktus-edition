@@ -9,6 +9,7 @@ import requests
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
+option.add_argument("--window-size=1280,1024")
 option.add_argument('--headless')
 
 
