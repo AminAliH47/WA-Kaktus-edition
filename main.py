@@ -32,7 +32,7 @@ class Analyze:
     saved_path = "C:/Users/amina/OneDrive/Documents/Kaktus"
 
     def __init__(self, main_url,
-                 name, saved_path=saved_path,
+                 name="Analyze", saved_path=saved_path,
                  webdriver_path=webdriver_path):
         self.main_url = main_url
         self.name = name
