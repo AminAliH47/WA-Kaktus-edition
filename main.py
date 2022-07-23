@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.common import ElementNotInteractableException, NoSuchElementException
+from selenium.common import ElementNotInteractableException, NoSuchElementException, TimeoutException
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
@@ -44,16 +44,21 @@ class Analyze:
     def create_directory(self):
         import os
 
-        # Create path
+        # Create directory
         path = os.path.join(self.saved_path, self.name)
 
-        # Create directory
         try:
             os.mkdir(path)
         except FileExistsError:
-            return print("Directory already exists!")
+            # Save new path in saved path
+            self.saved_path = path
 
+            print("Directory already exists!")
+            return self.saved_path
+
+        # Save new path in saved path
         self.saved_path = path
+
         print("Directory Created!")
         return self.saved_path
 
@@ -253,7 +258,7 @@ class Analyze:
         driver.get(hash_map[protocol + '_address'])
 
         # Change window size for image size
-        driver.set_window_size(1300, 700)
+        driver.set_window_size(1280, 1024)
 
         # Find searchbar in page
         try:
@@ -280,17 +285,16 @@ class Analyze:
             driver.execute_script('document.querySelector(".devices blockquote").remove()')
 
         # Fixing image for good picture by changing style
-        sleep(2)
-        driver.execute_script("window.scrollTo({top:70, left:0, behavior: 'smooth'})")
-        driver.execute_script("document.body.style.zoom='110%'")
+        sleep(3)
+        driver.execute_script("window.scrollTo({top:70, left:0, behavior: 'auto'})")
 
         # Save file
         sleep(hash_map[protocol + '_sleep'])
         driver.save_screenshot(f"{self.saved_path}/responsive.png")
 
         # Crop and save the image
-        image = Image.open(f"{self.saved_path}/responsive.png")
-        image.crop(hash_map[protocol + '_size']).save(f"{self.saved_path}/responsive.png")
+        # image = Image.open(f"{self.saved_path}/responsive.png")
+        # image.crop(hash_map[protocol + '_size']).save(f"{self.saved_path}/responsive.png")
 
         return print("Responsive Done!")
 
@@ -301,10 +305,14 @@ class Analyze:
         driver.delete_all_cookies()
 
         # Get Responsive website URL
-        driver.get("https://gtmetrix.com/")
+        try:
+            driver.get("https://gtmetrix.com/")
+            driver.set_page_load_timeout(400)
+        except TimeoutException:
+            return print(txtcolor.FAIL + "{'Error': 'Page timeout', 'Name': 'GTmetrix'}")
 
         # Change window size for image size
-        driver.set_window_size(1300, 700)
+        driver.set_window_size(1280, 1024)
 
         # === Login Section ===
         sleep(2)
@@ -344,20 +352,21 @@ class Analyze:
             return print("GTMetrix Login error!")
 
         # Find searchbar in page
-        sleep(5)
+        sleep(6)
         try:
             search_bar = driver.find_element(By.XPATH, '/html/body/div[1]/main/article/form/div[1]/div[1]/div/input')
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Search URL Field)', 'Name': 'GTMetrix'}")
 
         # Pass Main URL to GTMetrix website
-        sleep(2)
+        sleep(3)
         try:
             search_bar.send_keys(self.main_url)
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + "{'Error': 'Element Not Interactable (Search URL Field)', 'Name': 'GTMetrix'}")
 
         # Find and submit Main URL to GTMetrix website
+        sleep(3)
         try:
             submit_url_btn = driver.find_element(By.XPATH,
                                                  '/html/body/div[1]/main/article/form/div[1]/div[2]/button'
@@ -372,17 +381,17 @@ class Analyze:
 
         # Fixing image for good picture by changing style
         sleep(5)
-        driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'smooth'})")
+        driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'auto'})")
         driver.execute_script("document.body.style.zoom='90%'")
 
         # Save file
         driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
 
         # Crop and save the image
-        image = Image.open(f"{self.saved_path}/gtmetrix.png")
-        image.crop((28, 15, 1080, 560)).save(f"{self.saved_path}/gtmetrix.png")
+        # image = Image.open(f"{self.saved_path}/gtmetrix.png")
+        # image.crop((28, 15, 1080, 560)).save(f"{self.saved_path}/gtmetrix.png")
 
-        return print("GTMetrix Done!")
+        return print("GTmetrix Done!")
 
     def get_backlinks(self):
         driver = self.driver
@@ -394,7 +403,7 @@ class Analyze:
         driver.get("https://lxrmarketplace.com/seo-inbound-link-checker-tool.html")
 
         # Change window size for image size
-        driver.set_window_size(1300, 700)
+        driver.set_window_size(1280, 1024)
 
         # Find searchbar in page
         try:
@@ -415,15 +424,15 @@ class Analyze:
         driver.execute_script('document.querySelector("#frm-wrap").remove()')
 
         # Fixing image for good picture by changing style
-        driver.execute_script("window.scrollTo({top:30, left:0, behavior: 'smooth'})")
+        driver.execute_script("window.scrollTo({top:30, left:0, behavior: 'auto'})")
 
         # Save file
         sleep(3)
         driver.save_screenshot(f"{self.saved_path}/backlinks.png")
 
         # Crop and save the image
-        image = Image.open(f"{self.saved_path}/backlinks.png")
-        image.crop((100, 150, 1250, 540)).save(f"{self.saved_path}/backlinks.png")
+        # image = Image.open(f"{self.saved_path}/backlinks.png")
+        # image.crop((100, 150, 1250, 540)).save(f"{self.saved_path}/backlinks.png")
 
         return print("Backlinks Done!")
 
