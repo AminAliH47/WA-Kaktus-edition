@@ -284,8 +284,8 @@ class Analyze:
         driver.save_screenshot(f"{self.saved_path}/responsive.png")
 
         # Crop and save the image
-        # image = Image.open(f"{self.saved_path}/responsive.png")
-        # image.crop((160, 220, 1090, 730)).save(f"{self.saved_path}/responsive.png")
+        image = Image.open(f"{self.saved_path}/responsive.png")
+        image.crop((140, 90, 1115, 635)).save(f"{self.saved_path}/responsive.png")
 
         return print("Responsive Done!")
 
