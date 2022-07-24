@@ -1,16 +1,24 @@
 from selenium import webdriver
-from selenium.common import ElementNotInteractableException, NoSuchElementException, TimeoutException, \
-    JavascriptException
+from selenium.common import (
+    ElementNotInteractableException, NoSuchElementException,
+    TimeoutException, JavascriptException,
+    InvalidArgumentException,
+)
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
-from PIL import Image, ImageFont, ImageDraw
+from PIL import (Image, ImageFont, ImageDraw, )
 from decouple import config
 import requests
+import os
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
 option.add_argument("--window-size=1280,1024")
+
+prefs = {"download.default_directory": os.getcwd()}
+option.add_experimental_option("prefs", prefs)
+
 option.add_argument('--headless')
 
 
@@ -44,7 +52,6 @@ class Analyze:
         self.driver = webdriver.Chrome(self.webdriver_path, options=option)
 
     def create_directory(self):
-        import os
 
         # Create directory
         path = os.path.join(self.saved_path, self.name)
@@ -98,6 +105,110 @@ class Analyze:
                 driver.find_element(by, el)
             except NoSuchElementException:
                 break
+
+    def optimize(self):
+        import shutil
+        import zipfile
+        driver = self.driver
+        saved_path = self.saved_path
+
+        # Get Image compressor URL
+        driver.get("https://imagecompressor.com/")
+
+        # Get Upload Button
+        sleep(2)
+        try:
+            upload_btn = driver.find_element(By.XPATH, '//*[@id="fileSelector"]')
+        except NoSuchElementException:
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Upload Button)', 'Name': 'Optimize'}")
+
+        # Upload images
+        try:
+            upload_btn.send_keys(f"{saved_path}/whois.png")
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (whois image)', 'Name': 'Optimize'}")
+        except InvalidArgumentException:
+            print(txtcolor.FAIL + "{'Error': 'File not found! (whois image)', 'Name': 'Optimize'}")
+            pass
+
+        try:
+            upload_btn.send_keys(f"{saved_path}/responsive.png")
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (responsive image)', 'Name': 'Optimize'}")
+        except InvalidArgumentException:
+            print(txtcolor.FAIL + "{'Error': 'File not found! (responsive image)', 'Name': 'Optimize'}")
+            pass
+
+        try:
+            upload_btn.send_keys(f"{saved_path}/gtmetrix.png")
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (gtmetrix image)', 'Name': 'Optimize'}")
+        except InvalidArgumentException:
+            print(txtcolor.FAIL + "{'Error': 'File not found! (gtmetrix image)', 'Name': 'Optimize'}")
+            pass
+
+        try:
+            upload_btn.send_keys(f"{saved_path}/backlinks.png")
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (backlinks image)', 'Name': 'Optimize'}")
+        except InvalidArgumentException:
+            print(txtcolor.FAIL + "{'Error': 'File not found! (backlinks image)', 'Name': 'Optimize'}")
+            pass
+
+        try:
+            upload_btn.send_keys(f"{saved_path}/AMP.png")
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (AMP image)', 'Name': 'Optimize'}")
+        except InvalidArgumentException:
+            print(txtcolor.FAIL + "{'Error': 'File not found! (AMP image)', 'Name': 'Optimize'}")
+            pass
+
+        try:
+            upload_btn.send_keys(f"{saved_path}/ssl.png")
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (ssl image)', 'Name': 'Optimize'}")
+        except InvalidArgumentException:
+            print(txtcolor.FAIL + "{'Error': 'File not found! (ssl image)', 'Name': 'Optimize'}")
+            pass
+
+        # Find and click download button
+        sleep(2)
+        try:
+            download_btn = driver.find_element(By.XPATH, '//*[@id="app"]/section[1]/div[3]/button')
+        except NoSuchElementException:
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Upload Button)', 'Name': 'Optimize'}")
+
+        sleep(22)
+        try:
+            download_btn.click()
+        except ElementNotInteractableException:
+            return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (download)', 'Name': 'Optimize'}")
+
+        sleep(12)
+
+        # Remove All unoptimized files
+        for file in os.listdir(saved_path):
+            try:
+                os.remove(os.path.join(saved_path, file))
+            except PermissionError:
+                return print(txtcolor.FAIL + "{'Error': 'Access is denied (removing file)', 'Name': 'Optimize'}")
+
+        # Move optimized files to saved path directory
+        src = os.path.join(os.getcwd(), "imagecompressor.zip")
+        dst = os.path.join(saved_path, "imagecompressor.zip")
+        try:
+            shutil.move(src, dst)
+        except FileNotFoundError:
+            return print(txtcolor.FAIL + "{'Error': 'File not fount! (move file)', 'Name': 'Optimize'}")
+
+        # Unzip compressed file
+        try:
+            with zipfile.ZipFile(dst, 'r') as compress:
+                compress.extractall(saved_path)
+        except FileNotFoundError:
+            pass
+
+        return print("Images Optimized!")
 
     def get_whois(self):
         driver = self.driver
