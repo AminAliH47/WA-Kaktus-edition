@@ -184,7 +184,12 @@ class Analyze:
         ip_info = requests.get(f"http://ip-api.com/json/{ip_address}").json()
 
         # Get IP Location
-        ip_location = ip_info['country']
+        try:
+            ip_city = f" - {ip_info['city']}"
+        except KeyError:
+            ip_city = ""
+
+        ip_location = ip_info['country'] + ip_city
 
         # Get country code
         country_code = ip_info['countryCode']
@@ -192,7 +197,7 @@ class Analyze:
         # Get Hosted website on server
         try:
             hosted_website = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]/b').text
-            hosted_website = f"  -  {hosted_website} other sites hosted on this server"
+            hosted_website = f" - {hosted_website} other sites hosted on this server"
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
 
