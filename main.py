@@ -1,5 +1,6 @@
 from selenium import webdriver
-from selenium.common import ElementNotInteractableException, NoSuchElementException, TimeoutException
+from selenium.common import ElementNotInteractableException, NoSuchElementException, TimeoutException, \
+    JavascriptException
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from time import sleep
@@ -184,7 +185,12 @@ class Analyze:
         ip_info = requests.get(f"http://ip-api.com/json/{ip_address}").json()
 
         # Get IP Location
-        ip_location = ip_info['country']
+        try:
+            ip_city = f" - {ip_info['city']}"
+        except KeyError:
+            ip_city = ""
+
+        ip_location = ip_info['country'] + ip_city
 
         # Get country code
         country_code = ip_info['countryCode']
@@ -192,7 +198,7 @@ class Analyze:
         # Get Hosted website on server
         try:
             hosted_website = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/div[1]/div[4]/div/div[1]/b').text
-            hosted_website = f"  -  {hosted_website} other sites hosted on this server"
+            hosted_website = f" - {hosted_website} other sites hosted on this server"
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Hosted website)', 'Name': 'Whois'}")
 
@@ -241,20 +247,6 @@ class Analyze:
     def get_responsive(self):
         driver = self.driver
 
-        protocol = self.protocol  # protocol type
-
-        # Hash map to hold reference data
-        hash_map = {
-            'https_address': "https://ui.dev/amiresponsive",
-            'http_address': "https://amiresponsive.co.uk/",
-            'https_search': '//*[@id="url"]',
-            'http_search': '//input[@name="site"]',
-            'https_sleep': 22,
-            'http_sleep': 12,
-            'https_size': (170, 30, 1230, 700),
-            'http_size': (150, 150, 1150, 680),
-        }
-
         # Get Responsive website URL
         driver.get("https://amiresponsive.co.uk/")
 
@@ -274,28 +266,26 @@ class Analyze:
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (Search Field)', 'Name': 'Responsive'}")
 
-        # if protocol == 'https':
-            # Turn background to Light
-            # dark_mode_btn = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/button')
-            # dark_mode_btn.click()
-
-        # elif protocol == 'http':
         # make page for good picture by removing element
-        sleep(1)
+        sleep(2)
         driver.execute_script('document.querySelector([role="main"]).style.background = "#fff"')
         driver.execute_script('document.querySelector(".devices blockquote").remove()')
+        try:
+            driver.execute_script('document.querySelector("form").remove()')
+        except JavascriptException:
+            pass
 
         # Fixing image for good picture by changing style
         sleep(3)
         driver.execute_script("window.scrollTo({top:70, left:0, behavior: 'auto'})")
 
         # Save file
-        sleep(hash_map[protocol + '_sleep'])
+        sleep(24)
         driver.save_screenshot(f"{self.saved_path}/responsive.png")
 
         # Crop and save the image
-        image = Image.open(f"{self.saved_path}/responsive.png")
-        image.crop((160, 220, 1090, 730)).save(f"{self.saved_path}/responsive.png")
+        # image = Image.open(f"{self.saved_path}/responsive.png")
+        # image.crop((160, 220, 1090, 730)).save(f"{self.saved_path}/responsive.png")
 
         return print("Responsive Done!")
 
