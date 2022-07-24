@@ -256,14 +256,14 @@ class Analyze:
         }
 
         # Get Responsive website URL
-        driver.get(hash_map[protocol + '_address'])
+        driver.get("https://amiresponsive.co.uk/")
 
         # Change window size for image size
         driver.set_window_size(1280, 1024)
 
         # Find searchbar in page
         try:
-            search_bar = driver.find_element(By.XPATH, hash_map[protocol + '_search'])
+            search_bar = driver.find_element(By.XPATH, '//input[@name="site"]')
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element!', 'Name': 'Responsive'}")
 
@@ -274,16 +274,16 @@ class Analyze:
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + "{'Error': 'Element not intractable! (Search Field)', 'Name': 'Responsive'}")
 
-        if protocol == 'https':
+        # if protocol == 'https':
             # Turn background to Light
-            dark_mode_btn = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/button')
-            dark_mode_btn.click()
+            # dark_mode_btn = driver.find_element(By.XPATH, '//*[@id="__next"]/div[2]/div[2]/button')
+            # dark_mode_btn.click()
 
-        elif protocol == 'http':
-            # make page for good picture by removing element
-            sleep(1)
-            driver.execute_script('document.querySelector([role="main"]).style.background = "#fff"')
-            driver.execute_script('document.querySelector(".devices blockquote").remove()')
+        # elif protocol == 'http':
+        # make page for good picture by removing element
+        sleep(1)
+        driver.execute_script('document.querySelector([role="main"]).style.background = "#fff"')
+        driver.execute_script('document.querySelector(".devices blockquote").remove()')
 
         # Fixing image for good picture by changing style
         sleep(3)
@@ -294,8 +294,8 @@ class Analyze:
         driver.save_screenshot(f"{self.saved_path}/responsive.png")
 
         # Crop and save the image
-        # image = Image.open(f"{self.saved_path}/responsive.png")
-        # image.crop(hash_map[protocol + '_size']).save(f"{self.saved_path}/responsive.png")
+        image = Image.open(f"{self.saved_path}/responsive.png")
+        image.crop((160, 220, 1090, 730)).save(f"{self.saved_path}/responsive.png")
 
         return print("Responsive Done!")
 
@@ -393,8 +393,8 @@ class Analyze:
         driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
 
         # Crop and save the image
-        # image = Image.open(f"{self.saved_path}/gtmetrix.png")
-        # image.crop((28, 15, 1080, 560)).save(f"{self.saved_path}/gtmetrix.png")
+        image = Image.open(f"{self.saved_path}/gtmetrix.png")
+        image.crop((15, 5, 1070, 600)).save(f"{self.saved_path}/gtmetrix.png")
 
         return print("GTmetrix Done!")
 
@@ -436,8 +436,8 @@ class Analyze:
         driver.save_screenshot(f"{self.saved_path}/backlinks.png")
 
         # Crop and save the image
-        # image = Image.open(f"{self.saved_path}/backlinks.png")
-        # image.crop((100, 150, 1250, 540)).save(f"{self.saved_path}/backlinks.png")
+        image = Image.open(f"{self.saved_path}/backlinks.png")
+        image.crop((90, 130, 1230, 540)).save(f"{self.saved_path}/backlinks.png")
 
         return print("Backlinks Done!")
 
