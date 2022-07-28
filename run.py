@@ -5,11 +5,11 @@ import time
 url = input("Please Enter Website URL: \n")
 
 # Get Website Name
-name = input("Please Enter Website Name: (Optional) \n")
-name = "Analyze" if name == "" else name
+name = input("Please Enter Website Name: (Optional) \n") or "Analyze"
+# name = "Analyze" if name == "" else name
 
-SADRA_PATH = ["F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe"]  # Don't touch this line. (NEVER)
-AMIN_PATH = ["C:/Users/amina/OneDrive/Documents/Kaktus", "C:/Users/amina/Downloads/chromedriver.exe"]
+# SADRA_PATH = ["F:/GitHub/Automation", "F:/GitHub/Automation/chromedriver.exe"]  # Don't touch this line. (NEVER)
+# AMIN_PATH = ["C:/Users/amina/OneDrive/Documents/Kaktus", "C:/Users/amina/Downloads/chromedriver.exe"]
 
 anz = Analyze(url, name)
 
@@ -18,12 +18,12 @@ anz.create_directory()
 
 s = time.time()
 
-anz.get_whois()
-anz.get_responsive()
-anz.get_gtmetrix()
+# anz.get_whois()
+# anz.get_responsive()
+# anz.get_gtmetrix()
 anz.get_backlinks()
-anz.get_amp()
-anz.get_ssl()
+# anz.get_amp()
+# anz.get_ssl()
 
 # Optimize Images
 while True:
@@ -37,7 +37,7 @@ while True:
         print("Please enter correct value")
 
 e = time.time()
-print(f'Done in {int(e-s)} seconds.')
+print(f'Done in {int(e - s)} seconds.')
 
 # Close Driver After Analyze
 anz.driver.close()

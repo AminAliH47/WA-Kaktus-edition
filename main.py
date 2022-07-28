@@ -38,8 +38,8 @@ txtcolor = TextColors()
 
 
 class Analyze:
-    webdriver_path = "C:/Users/amina/Downloads/chromedriver.exe"
-    saved_path = "C:/Users/amina/OneDrive/Documents/Kaktus"
+    webdriver_path = "/home/aminali/Downloads/chromedriver"
+    saved_path = "/home/aminali/Documents/Kaktus"
 
     def __init__(self, main_url,
                  name="Analyze", saved_path=saved_path,
@@ -514,15 +514,19 @@ class Analyze:
         # Find searchbar in page
         try:
             search_bar = driver.find_element(By.XPATH, '//input[@name="url"]')
-        except NoSuchElementException:
-            return print(txtcolor.FAIL + "{'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'}")
-
-        # Pass Main URL to backlinks website
-        try:
             search_bar.send_keys(self.main_url)
             search_bar.send_keys(Keys.RETURN)
+        except NoSuchElementException:
+            return print(txtcolor.FAIL + "{'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'}")
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
+
+        # Pass Main URL to backlinks website
+        # try:
+        #     search_bar.send_keys(self.main_url)
+        #     search_bar.send_keys(Keys.RETURN)
+        # except ElementNotInteractableException:
+        #     return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
 
         # Fixing image for good picture by changing style
         sleep(1)
