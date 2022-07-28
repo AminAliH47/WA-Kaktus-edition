@@ -36,7 +36,7 @@ class TextColors:
 
 txtcolor = TextColors()
 
-
+# Test
 class Analyze:
     webdriver_path = "/home/aminali/Downloads/chromedriver"
     saved_path = "/home/aminali/Documents/Kaktus"
