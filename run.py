@@ -18,12 +18,12 @@ anz.create_directory()
 
 s = time.time()
 
-# anz.get_whois()
-# anz.get_responsive()
-# anz.get_gtmetrix()
+anz.get_whois()
+anz.get_responsive()
+anz.get_gtmetrix()
 anz.get_backlinks()
-# anz.get_amp()
-# anz.get_ssl()
+anz.get_amp()
+anz.get_ssl()
 
 # Optimize Images
 while True:
