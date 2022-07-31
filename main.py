@@ -36,6 +36,7 @@ class TextColors:
 
 txtcolor = TextColors()
 
+
 class Analyze:
     webdriver_path = "/home/aminali/Downloads/chromedriver"
     saved_path = "/home/aminali/Documents/Kaktus"
@@ -94,7 +95,7 @@ class Analyze:
     def _wait_until(self, by: str, el: str):
         """
         It checks every five seconds Element Exists in page or not
-        If Element Exists in page, It check again else break loop.
+        If Element Exists in page, It checks again else break loop.
 
         (It's good for when you want check is page reloaded or not)
 
@@ -111,6 +112,11 @@ class Analyze:
                 break
 
     def optimize(self):
+        """
+        Optimize Images for web
+
+        :return: Optimized Images
+        """
         import shutil
         import zipfile
         driver = self.driver
