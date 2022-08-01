@@ -196,7 +196,7 @@ class Analyze(Handler):
             print("Directory already exists!")
             return self.saved_path
         else:
-            path = f"{self.file_location}/{self.name}"
+            path = f"{self.file_location}/save/{self.name}"
         
         try:
             os.mkdir(path)
