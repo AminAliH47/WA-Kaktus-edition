@@ -11,6 +11,12 @@ from PIL import (Image, ImageFont, ImageDraw, )
 from decouple import config
 import requests
 import os
+# Import regex
+import re
+# Platform
+import sys
+# urllib for try catch
+import urllib
 
 # Config Important Options for Webdriver
 option = webdriver.ChromeOptions()
@@ -19,7 +25,7 @@ option.add_argument("--window-size=1280,1024")
 prefs = {"download.default_directory": os.getcwd()}
 option.add_experimental_option("prefs", prefs)
 
-option.add_argument('--headless')
+# option.add_argument('--headless')
 
 
 class TextColors:
@@ -37,21 +43,145 @@ class TextColors:
 txtcolor = TextColors()
 
 
-class Analyze:
-    webdriver_path = "/home/aminali/Downloads/chromedriver"
-    saved_path = "/home/aminali/Documents/Kaktus"
+class Handler():
 
-    def __init__(self, main_url,
-                 name="Analyze", saved_path=saved_path,
-                 webdriver_path=webdriver_path):
-        self.main_url = main_url
+    
+    def check_protocol(self, url) -> str:
+        hprotocol = 'https' if 'https' in url else 'http'
+        return hprotocol
+    
+    def url_handler(self, url) -> bool:
+        """
+        This function is for handling the URL.
+        It will check if the URL is valid or not.
+        If it's valid, It will return True & save the url in main_url.
+        If it's not valid, It will return False.
+
+        :param url: URL you want to check
+        :return: If URL is valid return True, else return False
+        """
+        
+        regex = ("((http|https)://)(www.)?" +
+                "[a-zA-Z0-9@:%._\\+~#?&//=]" +
+                "{2,256}\\.[a-z]" +
+                "{2,6}\\b([-a-zA-Z0-9@:%" +
+                "._\\+~#?&//=]*)")
+        pattern = re.compile(regex)
+        
+        if re.search(pattern, url):
+            return True
+        else:
+            protocol = self.check_protocol(url)
+            if protocol in url:
+                if "://" in url:
+                    return False
+                else:
+                    new_url = f"{protocol}://{url}"
+                    if re.search(pattern, new_url):
+                        return True
+                    else:
+                        return False
+            else:
+                new_url = f"{protocol}://{url}"
+                if re.search(pattern, new_url):
+                    return True
+                else:
+                    return False
+
+    def driver_handler(self) -> str:
+        project_location = os.path.dirname(__file__)
+        is_exist = os.path.isfile(path=os.path.join(project_location, 'chromedriver'+self.platform))
+        if is_exist:
+            hwebdriver_path = os.path.join(project_location, 'chromedriver'+self.platform)
+            return hwebdriver_path
+        else:
+            path = self._find_driver()
+            if type(path) == str:
+                hwebdriver_path = path
+                return hwebdriver_path
+            else:
+                self.driver_handler()
+    
+    
+    # using 'in' keyword in if , to detect y in yes (if user enter yes) or detect n in no
+    def _find_driver(self):
+        ask = str(input("Do You Have ChromeDriver in your system? (y/n): ")).lower()
+        if 'y' in ask:
+            file_path = self._ask_driver_location()
+            if "chromedriver" in file_path:
+                return file_path
+            else:
+                self._ask_driver_location()
+            
+        elif 'n' in ask:
+            ask = str(input("Do You Want Use Automatic Chromedriver Downloader ? (y/n): ")).lower()
+            if "y" in ask: 
+                self._download_driver()
+                return True
+            elif 'n' in ask:
+                print("Please Download ChromeDriver")
+                input()
+                exit()
+        else:
+            self._find_driver()
+    
+    def _download_driver(self):
+        try:
+            import chromedriver_autoinstaller
+        except:
+            self._downloadlibrary()
+        try:
+            chromedriver_autoinstaller.install()
+        except urllib.error.HTTPError:
+            print("Cannot Download ChromeDriver Please Check Your Internet Connection")
+            input()
+            exit()
+        except ConnectionResetError:
+            print("Cannot Download ChromeDriver Please Download It Manually")
+            input()
+            exit()
+        
+    
+    #no param for this section beacuse we need only chromedriver-autoinstaller 
+    #if you want add another library please edit function to give package name as param
+    def _downloadlibrary(self):
+        import pip, importlib
+        try:
+            importlib.import_module("chromedriver-autoinstaller")
+            
+        except ImportError:
+            try:
+                pip.main(["install", "chromedriver-autoinstaller"])
+            except:
+                print("Cant Install Package Please Instal It Manauly (chromedriver-autoinstaller)!")
+                input()
+                exit()
+        finally:
+            globals()["chromedriver-autoinstaller"] = importlib.import_module("chromedriver-autoinstaller")    
+    def _ask_driver_location(self):
+        import tkinter as tk
+        from tkinter import filedialog
+        root = tk.Tk()
+        root.withdraw()
+        
+        file_path = filedialog.askopenfilename()
+        return file_path
+    
+    
+class Analyze(Handler):
+
+    def __init__(self, url, name="Analyze"):
         self.name = name
-        self.webdriver_path = webdriver_path
-        self.protocol = 'https' if 'https' in main_url else 'http'
-        self.saved_path = saved_path
+        self.platform = ".exe" if sys.platform.startswith("win") else ''
+        self.main_url = url
+        self.protocol = self.check_protocol(url)
+        self.webdriver_path = self.driver_handler()
+        self.file_location = os.path.dirname(__file__)
+        self.saved_path = self.create_directory()
         self.driver = webdriver.Chrome(self.webdriver_path, options=option)
 
-    def create_directory(self):
+
+    def create_directory(self) -> str:
         """
         Creating a directory with the default name of analysis in the saved path.
         If you enter your desired name, this function will create a directory with the same name for you.
@@ -59,8 +189,15 @@ class Analyze:
         :return: New saved path
         """
         # Create directory
-        path = os.path.join(self.saved_path, self.name)
-
+        
+        #check isdir for prevent error if directory is not exist
+        if os.path.isdir(os.path.join(self.file_location, self.name)):
+            path = os.path.join(self.file_location, self.name)
+            print("Directory already exists!")
+            return self.saved_path
+        else:
+            path = f"{self.file_location}/{self.name}"
+        
         try:
             os.mkdir(path)
         except FileExistsError:
@@ -76,7 +213,7 @@ class Analyze:
         print("Directory Created!")
         return self.saved_path
 
-    def _check_exists(self, by, el):
+    def _check_exists(self, by, el) -> bool:
         """
         Check element exists in page or not.
 
@@ -91,7 +228,7 @@ class Analyze:
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + '{"Error": "Element not interactable!", "name": "Checking exists method"}')
         return True
-
+    
     def _wait_until(self, by: str, el: str):
         """
         It checks every five seconds Element Exists in page or not
@@ -223,7 +360,7 @@ class Analyze:
     def get_whois(self):
         driver = self.driver
         website_driver = self.driver
-
+        
         website_driver.get(self.main_url)
 
         # Get Website title
@@ -238,8 +375,7 @@ class Analyze:
         except NoSuchElementException:
             return print(txtcolor.FAIL + "{'Error': 'No such element!', 'Name': 'Whois'}")
 
-        # Import regex
-        import re
+
 
         # Our whois API
         api_url = "https://www.whoisxmlapi.com/whoisserver/WhoisService"
@@ -499,6 +635,14 @@ class Analyze:
         sleep(5)
         driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'auto'})")
         driver.execute_script("document.body.style.zoom='90%'")
+        
+        # Delete ADS banner from page
+        sleep(2)
+        try:
+            banner = driver.find_element(By.XPATH, '//div[@id="summer"]')
+            driver.execute_script("arguments[0].remove()", banner)
+        except NoSuchElementException:
+            pass
 
         # Save file
         driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
@@ -531,12 +675,6 @@ class Analyze:
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
 
-        # Pass Main URL to backlinks website
-        # try:
-        #     search_bar.send_keys(self.main_url)
-        #     search_bar.send_keys(Keys.RETURN)
-        # except ElementNotInteractableException:
-        #     return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
 
         # Fixing image for good picture by changing style
         sleep(1)
