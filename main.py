@@ -644,6 +644,14 @@ class Analyze(Handler):
         except NoSuchElementException:
             pass
 
+        # Delete ADS banner from page
+        sleep(2)
+        try:
+            banner = driver.find_element(By.XPATH, '//div[@id="summer"]')
+            driver.execute_script("arguments[0].remove()", banner)
+        except NoSuchElementException:
+            pass
+
         # Save file
         driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
 
