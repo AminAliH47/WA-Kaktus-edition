@@ -25,7 +25,7 @@ option.add_argument("--window-size=1280,1024")
 prefs = {"download.default_directory": os.getcwd()}
 option.add_experimental_option("prefs", prefs)
 
-# option.add_argument('--headless')
+option.add_argument('--headless')
 
 
 class TextColors:
