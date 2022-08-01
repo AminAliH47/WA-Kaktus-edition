@@ -1,9 +1,18 @@
-from main import Analyze
+from main import Analyze, Handler
 import time
 
+a = Handler()
 # Get Website URL
-url = input("Please Enter Website URL: \n")
+def ask_url() -> str :
 
+    url = input("Please Enter Website URL: \n").lower()
+    check_url = a.url_handler(url)
+    if check_url is False:
+        print("invalid Url")
+        ask_url()
+    else:
+        return url
+url = ask_url()
 # Get Website Name
 name = input("Please Enter Website Name: (Optional) \n") or "Analyze"
 
