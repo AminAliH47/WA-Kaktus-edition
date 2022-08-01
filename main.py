@@ -500,6 +500,14 @@ class Analyze:
         driver.execute_script("window.scrollTo({top:80, left:0, behavior: 'auto'})")
         driver.execute_script("document.body.style.zoom='90%'")
 
+        # Delete ADS banner from page
+        sleep(2)
+        try:
+            banner = driver.find_element(By.XPATH, '//div[@id="summer"]')
+            driver.execute_script("arguments[0].remove()", banner)
+        except NoSuchElementException:
+            pass
+
         # Save file
         driver.save_screenshot(f"{self.saved_path}/gtmetrix.png")
 
@@ -530,13 +538,6 @@ class Analyze:
             return print(txtcolor.FAIL + "{'Error': 'No such element! (Search Field)', 'Name': 'Backlinks'}")
         except ElementNotInteractableException:
             return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
-
-        # Pass Main URL to backlinks website
-        # try:
-        #     search_bar.send_keys(self.main_url)
-        #     search_bar.send_keys(Keys.RETURN)
-        # except ElementNotInteractableException:
-        #     return print(txtcolor.FAIL + "{'Error': 'Element not intractable!'}")
 
         # Fixing image for good picture by changing style
         sleep(1)
